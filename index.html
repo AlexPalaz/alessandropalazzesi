@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alessandro Palazzesi — Frontend Architect & Technical Lead</title>
+  <meta name="description" content="Frontend Architect & Technical Lead. Building scalable web platforms and AI-powered products. Based in Turin, available for consulting engagements." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: #0A0E0D; color: #D4D2CB;
+      font-family: "Inter Tight", system-ui, sans-serif;
+      scroll-behavior: smooth;
+    }
+    body { min-height: 100vh; }
+    ::selection { background: oklch(0.78 0.12 175); color: #0A0E0D; }
+    a { color: inherit; }
+    input::placeholder, textarea::placeholder { color: rgba(212, 210, 203, 0.35); }
+    select option { color: #D4D2CB; background: #0A0E0D; }
+
+    /* Page fade transition */
+    .page-fade { opacity: 0; transform: translateY(8px); animation: pageIn .45s ease forwards; }
+    @keyframes pageIn { to { opacity: 1; transform: translateY(0); } }
+  </style>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" src="site/shared.jsx"></script>
+  <script type="text/babel" src="site/pages/home.jsx"></script>
+  <script type="text/babel" src="site/pages/work.jsx"></script>
+  <script type="text/babel" src="site/pages/case-study.jsx"></script>
+  <script type="text/babel" src="site/pages/services.jsx"></script>
+  <script type="text/babel" src="site/pages/process.jsx"></script>
+  <script type="text/babel" src="site/pages/about.jsx"></script>
+  <script type="text/babel" src="site/pages/contact.jsx"></script>
+
+  <script type="text/babel">
+    const App = () => {
+      const { THEME, GridBg, StatusBar, NavBar, Footer,
+              HomePage, WorkPage, CaseStudyPage, ServicesPage,
+              ProcessPage, AboutPage, ContactPage } = window;
+
+      const [route, setRoute] = React.useState(window.location.hash || '#/');
+
+      React.useEffect(() => {
+        const onHash = () => {
+          setRoute(window.location.hash || '#/');
+          // scroll to top on route change
+          window.scrollTo({ top: 0, behavior: 'instant' });
+        };
+        window.addEventListener('hashchange', onHash);
+        return () => window.removeEventListener('hashchange', onHash);
+      }, []);
+
+      const navigate = (hash) => {
+        if (hash === window.location.hash) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+        window.location.hash = hash;
+      };
+
+      // Route matching
+      let page, statusPath;
+      if (route === '#/' || route === '') {
+        page = <HomePage onNavigate={navigate} />;
+        statusPath = '/';
+      } else if (route === '#/work') {
+        page = <WorkPage onNavigate={navigate} />;
+        statusPath = '/work';
+      } else if (route.startsWith('#/work/')) {
+        const slug = route.slice('#/work/'.length);
+        page = <CaseStudyPage slug={slug} onNavigate={navigate} />;
+        statusPath = `/work/${slug}`;
+      } else if (route === '#/services') {
+        page = <ServicesPage onNavigate={navigate} />;
+        statusPath = '/services';
+      } else if (route === '#/process') {
+        page = <ProcessPage onNavigate={navigate} />;
+        statusPath = '/process';
+      } else if (route === '#/about') {
+        page = <AboutPage onNavigate={navigate} />;
+        statusPath = '/about';
+      } else if (route === '#/contact') {
+        page = <ContactPage onNavigate={navigate} />;
+        statusPath = '/contact';
+      } else {
+        page = (
+          <section style={{ maxWidth: 1080, margin: '0 auto', padding: '160px 48px', textAlign: 'center' }}>
+            <div style={{ color: THEME.dim, fontFamily: THEME.mono, fontSize: 13, marginBottom: 16 }}>
+              <span style={{ color: THEME.accent }}>$</span> find . -name "{route.slice(2)}"
+            </div>
+            <h1 style={{ fontFamily: THEME.sans, fontSize: 72, color: THEME.fgStrong, margin: 0, fontWeight: 500 }}>
+              404 — <span style={{ fontFamily: THEME.serif, fontStyle: 'italic', color: THEME.accent }}>not found</span>
+            </h1>
+            <a href="#/" onClick={() => navigate('#/')} style={{ color: THEME.accent, fontFamily: THEME.mono, display: 'inline-block', marginTop: 24 }}>
+              ← back home
+            </a>
+          </section>
+        );
+        statusPath = route.slice(1);
+      }
+
+      return (
+        <>
+          <GridBg />
+          <StatusBar path={statusPath} />
+          <NavBar route={route} onNavigate={navigate} />
+          <div key={route} className="page-fade">
+            <Page>{page}</Page>
+          </div>
+          <Footer />
+        </>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
