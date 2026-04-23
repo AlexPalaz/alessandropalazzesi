@@ -272,8 +272,8 @@ const HomePage = ({ onNavigate }) => {
               fontFamily: THEME.sans, fontSize: 72, fontWeight: 500, margin: 0,
               letterSpacing: '-0.02em', color: THEME.fgStrong, lineHeight: 1.05,
             }}>
-              Building between <span style={{ fontFamily: THEME.serif, color: THEME.accent }}>frontend</span>
-              <br />and <span style={{ fontFamily: THEME.serif, color: THEME.accent }}>AI</span>? Write me.
+              Building a <span style={{ fontFamily: THEME.serif, color: THEME.accent }}>web platform</span>,
+              <br /><span style={{ fontFamily: THEME.serif, color: THEME.accent }}>app</span> or <span style={{ fontFamily: THEME.serif, color: THEME.accent }}>AI product</span>? Write me.
             </h2>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 50 }}>
               <a href="#/contact" onClick={() => onNavigate('#/contact')} style={{
