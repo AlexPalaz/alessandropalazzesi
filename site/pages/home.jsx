@@ -1,10 +1,9 @@
 // Home page — hero + quick pitch + featured work + CTA.
 
 const HomePage = ({ onNavigate }) => {
-  const { THEME, Reveal, CmdHeader, CASE_STUDIES } = window;
+  const { THEME, Reveal, CmdHeader, CASE_STUDIES, COMPANIES } = window;
 
   const container = { maxWidth: 1280, margin: '0 auto', padding: '0 48px' };
-  const featured = CASE_STUDIES.slice(0, 4);
 
   return (
     <>
@@ -82,12 +81,12 @@ const HomePage = ({ onNavigate }) => {
         </Reveal>
       </section>
 
-      {/* FEATURED WORK TICKER */}
+      {/* COMPANIES TICKER */}
       <section style={{ borderTop: `1px solid ${THEME.border}`, borderBottom: `1px solid ${THEME.border}`, padding: '32px 0', overflow: 'hidden' }}>
         <div style={{ display: 'flex', gap: 60, fontFamily: THEME.serif, fontSize: 30, color: `${THEME.fg}70`, whiteSpace: 'nowrap', animation: 'marquee 40s linear infinite' }}>
           {[...Array(2)].map((_, k) => (
             <React.Fragment key={k}>
-              {['Juventus', 'MLS Soccer', 'Tokyo Olympics 2021', 'Illimity Bank', 'Nuvem', 'Gewiss', 'Deltatre', 'Presidenza del Consiglio'].map((n, i) => (
+              {['Presidenza del Consiglio', 'Deltatre', 'Nuvem', 'Enhancers — Tinexta Group', 'Illimity Bank', 'DM Group', 'Syncroweb'].map((n, i) => (
                 <React.Fragment key={i}>
                   <span>{n}</span>
                   <span style={{ color: THEME.accent }}>✦</span>
@@ -99,28 +98,28 @@ const HomePage = ({ onNavigate }) => {
         <style>{`@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
       </section>
 
-      {/* SELECTED WORK */}
+      {/* COMPANIES — primary employers */}
       <section style={{ ...container, paddingTop: 100, paddingBottom: 100 }}>
         <Reveal>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 60 }}>
             <div>
-              <CmdHeader cmd='git log --oneline --since="2019" --limit=4' />
+              <CmdHeader cmd='git log --author="alessandro" --format="%ae" | sort -u' />
               <h2 style={{ fontFamily: THEME.sans, fontSize: 48, fontWeight: 500, margin: 0, letterSpacing: '-0.02em', color: THEME.fgStrong }}>
-                Selected work.
+                Where I've been.
               </h2>
             </div>
             <a href="#/work" onClick={() => onNavigate('#/work')} style={{ color: THEME.accent, textDecoration: 'none', fontSize: 13 }}>
-              → all work ({CASE_STUDIES.length})
+              → full work history ({CASE_STUDIES.length})
             </a>
           </div>
         </Reveal>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: THEME.border }}>
-          {featured.map((cs, i) => (
-            <Reveal key={cs.slug} delay={i * 60}>
+          {COMPANIES.map((co, i) => (
+            <Reveal key={co.id} delay={i * 60}>
               <a
-                href={`#/work/${cs.slug}`}
-                onClick={() => onNavigate(`#/work/${cs.slug}`)}
+                href={co.href}
+                onClick={() => onNavigate(co.href)}
                 className="work-card"
                 style={{
                   display: 'block',
@@ -133,19 +132,22 @@ const HomePage = ({ onNavigate }) => {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: THEME.mono, fontSize: 11, color: THEME.dim, marginBottom: 24 }}>
-                  <span style={{ color: THEME.amber }}>{cs.hash}</span>
-                  <span>{cs.year}</span>
+                  <span style={{ color: THEME.amber }}>{co.role}</span>
+                  <span>{co.period}</span>
                 </div>
-                <div style={{ fontFamily: THEME.sans, fontSize: 34, fontWeight: 500, letterSpacing: '-0.01em', color: THEME.fgStrong, marginBottom: 12 }}>
-                  {cs.company}
+                <div style={{ fontFamily: THEME.sans, fontSize: 34, fontWeight: 500, letterSpacing: '-0.01em', color: THEME.fgStrong, marginBottom: 8 }}>
+                  {co.name}
+                </div>
+                <div style={{ fontFamily: THEME.mono, fontSize: 12, color: THEME.dim, marginBottom: 24 }}>
+                  {co.subtitle}
                 </div>
                 <div style={{ color: `${THEME.fg}AA`, fontSize: 14, marginBottom: 28, minHeight: 48 }}>
-                  {cs.message}
+                  {co.blurb}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontFamily: THEME.mono, fontSize: 11 }}>
-                  <span style={{ color: THEME.fg }}>{cs.role}</span>
+                  <span style={{ color: THEME.fg }}>{co.location}</span>
                   <span style={{ padding: '3px 10px', border: `1px solid ${THEME.accent}`, color: THEME.accent, letterSpacing: '0.1em' }}>
-                    {cs.tag}
+                    {co.tag}
                   </span>
                 </div>
               </a>

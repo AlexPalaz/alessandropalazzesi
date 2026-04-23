@@ -21,10 +21,10 @@ const AboutPage = ({ onNavigate }) => {
               </h1>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24, fontFamily: THEME.sans, fontSize: 18, color: `${THEME.fg}DD`, lineHeight: 1.65, maxWidth: 640 }}>
                 <p style={{ margin: 0 }}>
-                  I'm Alessandro. I'm a Frontend Architect and Technical Lead, based in Turin, Italy. I've spent nine years shipping software — first as a junior full-stack developer wiring up startup websites in PHP, then as a senior frontend engineer on projects like the Tokyo Olympics, MLS Soccer, Juventus, Illimity Bank.
+                  I'm Alessandro. I'm a Frontend Architect and Technical Lead, based in Turin. I've spent nine years shipping software — from my first junior full-stack role at Syncroweb wiring up startup websites, through DM Group (L'Oréal, Lamborghini, and the rest of that roster), then five and a half years at Enhancers — Tinexta Group on projects like the Tokyo Olympics, MLS Soccer, Juventus.com and the Gewiss E-Mobility app — ending as Technical Lead.
                 </p>
                 <p style={{ margin: 0 }}>
-                  For the last two years I've been working independently, mostly with US companies. I help teams with the parts of frontend engineering that don't fit in a ticket: architecture, design systems, developer experience, and — increasingly — bringing LLMs into real production workflows.
+                  Since late 2023 I've been working independently, mostly with international companies (Nuvem, Illimity Bank, Deltatre). In 2025 I joined the Italian Presidency of the Council of Ministers as Software Engineer / Esperto inside the Department for Digital Transformation. In parallel I help teams with the parts of frontend engineering that don't fit in a ticket — architecture, design systems, developer experience — and with bringing LLMs into real production workflows.
                 </p>
                 <p style={{ margin: 0 }}>
                   I care about teams more than stacks. I care about shipping more than framing. I still write code every day. I don't have a personal brand to maintain, a newsletter to grow, or a course to sell. I'm just trying to do the work well.
@@ -118,13 +118,16 @@ const AboutPage = ({ onNavigate }) => {
         <CmdHeader cmd="cat CHANGELOG.md" />
         <div style={{ borderTop: `1px solid ${THEME.border}` }}>
           {[
-            { y: '2025', t: 'Presidenza del Consiglio — Software Engineer' },
-            { y: '2024', t: 'Nuvem — Full Stack Engineer (ongoing)' },
-            { y: '2023', t: 'Started full-time independent contracting' },
-            { y: '2022', t: 'Technical Lead at a digital innovation studio' },
-            { y: '2018', t: 'Senior Front-end Developer, projects at Olympic scale' },
-            { y: '2017', t: 'Mid-level full-stack at a digital-transformation agency' },
-            { y: '2016', t: 'First commercial engineering role — startup websites' },
+            { y: '2025', t: 'Presidenza del Consiglio — Software Engineer / Esperto (Dipartimento trasformazione digitale)' },
+            { y: '2024', t: 'Freelance — Deltatre (sports tech) & Nuvem (340B healthcare SaaS)' },
+            { y: '2023', t: 'Started full-time independent contracting — first clients: Illimity Bank, Nuvem' },
+            { y: '2022', t: 'Technical Lead at Enhancers — Tinexta Group (Juventus.com page builder)' },
+            { y: '2021', t: 'Enhancers — Senior Frontend on Tokyo Olympics 2021 broadcast frontends' },
+            { y: '2020', t: 'Enhancers — Senior Frontend on MLS Soccer OTT platform' },
+            { y: '2019', t: 'Enhancers — Senior Frontend on Gewiss E-Mobility (React Native, BLE)' },
+            { y: '2018', t: 'Joined Enhancers as Senior Front-end Developer' },
+            { y: '2017', t: 'DM Group — Mid-Level Full Stack (L\'Oréal, Vichy, Givenchy, Lamborghini…)' },
+            { y: '2016', t: 'Syncroweb — Junior Full Stack, first commercial engineering role' },
           ].map((x, i) => (
             <Reveal key={i} delay={i * 30}>
               <div style={{

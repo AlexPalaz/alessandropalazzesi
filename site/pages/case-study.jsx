@@ -55,9 +55,15 @@ const CaseStudyPage = ({ slug, onNavigate }) => {
             {cs.company}
           </h1>
 
-          <div style={{ fontFamily: THEME.serif, fontSize: 28, color: THEME.accent, marginBottom: 40 }}>
+          <div style={{ fontFamily: THEME.serif, fontSize: 28, color: THEME.accent, marginBottom: cs.employer && cs.employer !== cs.company ? 10 : 40 }}>
             {cs.role}
           </div>
+
+          {cs.employer && cs.employer !== cs.company && (
+            <div style={{ fontFamily: THEME.mono, fontSize: 13, color: THEME.dim, marginBottom: 40 }}>
+              via {cs.employer}
+            </div>
+          )}
 
           <p style={{ fontFamily: THEME.sans, fontSize: 22, lineHeight: 1.5, color: THEME.fgStrong, maxWidth: 820, margin: 0 }}>
             {cs.summary}

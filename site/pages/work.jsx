@@ -22,7 +22,7 @@ const WorkPage = ({ onNavigate }) => {
             <span style={{ fontFamily: THEME.serif, color: THEME.accent }}>2019 → 2026</span>.
           </h1>
           <p style={{ fontFamily: THEME.sans, fontSize: 18, color: `${THEME.fg}CC`, maxWidth: 620, lineHeight: 1.55 }}>
-            Seven engagements, four sectors, one rule: ship things that outlast me on the team.
+            {CASE_STUDIES.length} engagements, {new Set(CASE_STUDIES.map(c => c.sector)).size} sectors, one rule: ship things that outlast me on the team.
           </p>
         </Reveal>
       </section>
