@@ -27,6 +27,108 @@
     /* Page fade transition */
     .page-fade { opacity: 0; transform: translateY(8px); animation: pageIn .45s ease forwards; }
     @keyframes pageIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* ===== Mobile overrides ===== */
+    @media (max-width: 768px) {
+      /* Section paddings collapse */
+      main section {
+        padding-top: 56px !important;
+        padding-bottom: 56px !important;
+      }
+      main section[style*="0 48px"],
+      main section > div[style*="0 48px"] {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+      }
+
+      /* Collapse multi-column grids to a single column, except form label rows */
+      main div[style*="grid-template-columns"]:not([style*="120px"]) {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+      }
+      main div[style*="grid-template-columns: 120px"] {
+        grid-template-columns: 84px 1fr !important;
+        gap: 10px !important;
+      }
+
+      /* Big headings scale */
+      main h1 {
+        font-size: clamp(38px, 11vw, 64px) !important;
+        line-height: 1.02 !important;
+        margin-bottom: 20px !important;
+      }
+      main h2 {
+        font-size: clamp(26px, 7vw, 42px) !important;
+        line-height: 1.1 !important;
+      }
+
+      /* Testimonial quote */
+      main blockquote { font-size: 18px !important; line-height: 1.5 !important; }
+
+      /* Button rows wrap (hero CTA, home CTA, contact channels) */
+      main div[style*="justify-content: center"][style*="gap: 16px"],
+      main div[style*="display: flex"][style*="gap: 12px"],
+      main div[style*="display: flex"][style*="gap: 16px"] {
+        flex-wrap: wrap !important;
+      }
+
+      /* Hero marquee: smaller, still scrollable */
+      main div[style*="animation: marquee"] {
+        font-size: 22px !important;
+        gap: 36px !important;
+      }
+
+      /* Contact form box tighter padding */
+      main form,
+      main div[style*="padding: 40px"] {
+        padding: 20px !important;
+      }
+      main div[style*="padding: 40px"] form { padding: 0 !important; }
+
+      /* Code-block hero: allow wrapping rather than overflowing */
+      main div[style*="padding-left: 24px"] {
+        padding-left: 12px !important;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+
+      /* ---- Status bar (outside main) ---- */
+      .status-bar { padding: 8px 14px !important; font-size: 10px !important; }
+      .status-bar-left { gap: 10px !important; flex-wrap: wrap !important; min-width: 0; }
+      .status-bar-left > span:nth-child(2) {
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw;
+      }
+      .status-bar-right { display: none !important; }
+
+      /* ---- Nav bar ---- */
+      .site-nav { padding: 12px 16px !important; gap: 10px !important; flex-wrap: wrap !important; }
+      .site-nav > a:first-child { font-size: 13px !important; }
+      .nav-menu {
+        gap: 14px !important;
+        font-size: 12px !important;
+        order: 3 !important;
+        width: 100% !important;
+        flex-wrap: wrap !important;
+        row-gap: 8px !important;
+        justify-content: flex-start !important;
+        padding-top: 4px;
+      }
+      .nav-cta { padding: 8px 12px !important; font-size: 11px !important; }
+
+      /* ---- Footer ---- */
+      .site-footer { padding: 32px 20px !important; }
+      .footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+        padding-bottom: 24px !important;
+      }
+      .footer-bottom {
+        flex-direction: column !important;
+        gap: 8px !important;
+        align-items: flex-start !important;
+        font-size: 10px !important;
+      }
+    }
   </style>
 
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>

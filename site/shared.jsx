@@ -30,7 +30,7 @@ const GridBg = () => (
 
 // IDE-style top status bar (same everywhere)
 const StatusBar = ({ path }) => (
-  <div style={{
+  <div className="status-bar" style={{
     display: 'flex',
     justifyContent: 'space-between',
     padding: '12px 24px',
@@ -42,12 +42,12 @@ const StatusBar = ({ path }) => (
     position: 'relative',
     zIndex: 10,
   }}>
-    <div style={{ display: 'flex', gap: 20 }}>
+    <div className="status-bar-left" style={{ display: 'flex', gap: 20, minWidth: 0 }}>
       <span style={{ color: THEME.accent }}>● READY</span>
       <span>~/apalazzesi/portfolio{path}</span>
       <span>main</span>
     </div>
-    <div style={{ display: 'flex', gap: 20 }}>
+    <div className="status-bar-right" style={{ display: 'flex', gap: 20 }}>
       <span>UTF-8</span>
       <span>TS</span>
       <span>LF</span>
@@ -83,7 +83,7 @@ const NavBar = ({ route, onNavigate }) => {
   };
 
   return (
-    <nav style={navStyle}>
+    <nav className="site-nav" style={navStyle}>
       <a href="#/" onClick={() => onNavigate('#/')} style={{
         color: THEME.fgStrong,
         textDecoration: 'none',
@@ -97,7 +97,7 @@ const NavBar = ({ route, onNavigate }) => {
         <span>alessandro.palazzesi</span>
       </a>
 
-      <div style={{ display: 'flex', gap: 28 }}>
+      <div className="nav-menu" style={{ display: 'flex', gap: 28 }}>
         {items.map(i => {
           const active = route.startsWith(i.route) && (i.route !== '#/' || route === '#/');
           return (
@@ -118,6 +118,7 @@ const NavBar = ({ route, onNavigate }) => {
       <a
         href="#/contact"
         onClick={() => onNavigate('#/contact')}
+        className="nav-cta"
         style={{
           padding: '10px 18px',
           background: THEME.accent,
@@ -136,7 +137,7 @@ const NavBar = ({ route, onNavigate }) => {
 
 // Site footer
 const Footer = () => (
-  <footer style={{
+  <footer className="site-footer" style={{
     borderTop: `1px solid ${THEME.border}`,
     padding: '40px 48px',
     fontFamily: THEME.mono,
@@ -147,7 +148,7 @@ const Footer = () => (
     zIndex: 5,
   }}>
     <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, paddingBottom: 40, borderBottom: `1px solid ${THEME.border}` }}>
+      <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 40, paddingBottom: 40, borderBottom: `1px solid ${THEME.border}` }}>
         <div>
           <div style={{ color: THEME.fgStrong, fontFamily: THEME.sans, fontSize: 16, fontWeight: 500, marginBottom: 14 }}>
             Alessandro Palazzesi
@@ -187,7 +188,7 @@ const Footer = () => (
           </div>
         </div>
       </div>
-      <div style={{ paddingTop: 24, display: 'flex', justifyContent: 'space-between' }}>
+      <div className="footer-bottom" style={{ paddingTop: 24, display: 'flex', justifyContent: 'space-between' }}>
         <span>© 2026 · alessandro.palazzesi</span>
         <span>→ alessandro.palazzesi@gmail.com</span>
         <span>build a7f3d21 · turin/it</span>
