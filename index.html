@@ -53,13 +53,18 @@
         animation-duration: 18s !important;
       }
 
-      /* Collapse multi-column grids to a single column, except form label rows */
-      main div[style*="grid-template-columns"]:not([style*="120px"]) {
+      /* Collapse multi-column grids to a single column, except form label rows
+         (120px label) and year-label rows (90px year kept side-by-side). */
+      main div[style*="grid-template-columns"]:not([style*="120px"]):not([style*="90px"]) {
         grid-template-columns: 1fr !important;
         gap: 32px !important;
       }
       main div[style*="grid-template-columns: 120px"] {
         grid-template-columns: 88px 1fr !important;
+        gap: 12px !important;
+      }
+      main div[style*="grid-template-columns: 90px"] {
+        grid-template-columns: 56px 1fr !important;
         gap: 12px !important;
       }
 
@@ -134,6 +139,77 @@
       main div[style*="font-size: 72px"] { font-size: 48px !important; }
       main div[style*="font-size: 64px"] { font-size: 44px !important; }
 
+      /* Tighten large bottom margins on section h2 (typically margin-bottom: 60) */
+      main h2[style*="margin-bottom: 60"] { margin-bottom: 24px !important; }
+      main h2[style*="margin-bottom: 48"] { margin-bottom: 20px !important; }
+
+      /* ===== Work list — card layout per case study row ===== */
+      .row-link {
+        display: grid !important;
+        grid-template-columns: auto 1fr auto !important;
+        grid-template-areas:
+          "hash  year  arrow"
+          "comp  comp  comp"
+          "msg   msg   msg"
+          "role  role  role" !important;
+        gap: 6px 12px !important;
+        padding: 20px 4px !important;
+      }
+      .row-link > :nth-child(1) { grid-area: hash; text-align: left !important; }
+      .row-link > :nth-child(2) { grid-area: year; text-align: right !important; }
+      .row-link > :nth-child(3) { grid-area: comp; font-size: 22px !important; margin-top: 4px; }
+      .row-link > :nth-child(4) { grid-area: msg; font-size: 13px !important; }
+      .row-link > :nth-child(5) { grid-area: role; text-align: left !important; }
+      .row-link > :nth-child(6) { grid-area: arrow; align-self: start; }
+
+      /* ===== Services — article rhythm ===== */
+      main article { padding: 32px 0 !important; }
+      main article[style*="grid-template-columns"] { gap: 24px !important; }
+      main article div[style*="grid-template-columns: 1fr 1fr"] { gap: 20px !important; }
+      /* Services left-column meta+CTA: kill the giant margin-top */
+      main article div[style*="margin-top: 32"] { margin-top: 16px !important; }
+      main article a[style*="margin-top: 24"] { margin-top: 14px !important; }
+
+      /* ===== Process — hide the empty node column + floating spine on mobile ===== */
+      /* Absolute vertical spine line (width 1, left 60) */
+      main div[style*="width: 1px"][style*="left: 60"] { display: none !important; }
+      /* Outer step grid: drop to single column */
+      main div[style*="grid-template-columns: 60px 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 0 !important;
+        padding-bottom: 32px !important;
+      }
+      /* Hide the node dot column (first child) */
+      main div[style*="grid-template-columns: 60px 1fr"] > div:first-child {
+        display: none !important;
+      }
+      /* Inner desc + time grid: promote time label to a chip above the title */
+      main div[style*="grid-template-columns: 1fr 140px"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+      main div[style*="grid-template-columns: 1fr 140px"] > :last-child {
+        order: -1 !important;
+        text-align: left !important;
+        padding-top: 0 !important;
+        align-self: flex-start !important;
+      }
+      /* Principles cards: kill minHeight so short cards don't pad dead space */
+      main div[style*="min-height: 220"] { min-height: 0 !important; }
+
+      /* ===== About — portrait + numbers ===== */
+      main div[style*="aspect-ratio: 3 / 4"] {
+        max-width: 180px !important;
+        margin: 0 auto !important;
+      }
+      /* Convert borderRight (side separator) to borderBottom on stacked numbers row */
+      main div[style*="grid-template-columns: repeat(4, 1fr)"] > div[style*="border-right"],
+      main div[style*="grid-template-columns"] > div[style*="border-right: 1px solid"] {
+        border-right: none !important;
+        border-bottom: 1px solid rgba(212, 210, 203, 0.12) !important;
+      }
+
       /* ---- Status bar (outside main) ---- */
       .status-bar { padding: 8px 14px !important; font-size: 10px !important; }
       .status-bar-left { gap: 10px !important; flex-wrap: wrap !important; min-width: 0; }
@@ -174,16 +250,19 @@
 
     /* ===== Ultra-narrow (phones <=380px) ===== */
     @media (max-width: 380px) {
-      main section[style*="0 48px"],
-      main section > div[style*="0 48px"] {
-        padding-left: 12px !important;
-        padding-right: 12px !important;
-      }
       main div[style*="padding: 40px"],
       main div[style*="padding: 40"] { padding: 14px !important; }
       main div[style*="padding: 32px"],
       main div[style*="padding: 32"] { padding: 14px !important; }
       main h1 { font-size: clamp(32px, 10.5vw, 48px) !important; }
+      /* Contact form label column: narrower on tiny screens */
+      main div[style*="grid-template-columns: 120px"] {
+        grid-template-columns: 72px 1fr !important;
+        gap: 10px !important;
+      }
+      /* Work list card: tighten horizontal gap further */
+      .row-link { gap: 4px 8px !important; padding: 16px 4px !important; }
+      .row-link > :nth-child(3) { font-size: 20px !important; }
     }
   </style>
 
