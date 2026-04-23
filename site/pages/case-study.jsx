@@ -2,7 +2,7 @@
 
 const CaseStudyPage = ({ slug, onNavigate }) => {
   const { THEME, Reveal, CmdHeader, CASE_STUDIES } = window;
-  const container = { maxWidth: 1080, margin: '0 auto', padding: '0 48px' };
+  const container = { maxWidth: 1080, margin: '0 auto', padding: '0 var(--page-pad)' };
 
   const cs = CASE_STUDIES.find(c => c.slug === slug);
   if (!cs) {

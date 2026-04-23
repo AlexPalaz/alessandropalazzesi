@@ -12,6 +12,9 @@
 
   <style>
     * { box-sizing: border-box; }
+    :root { --page-pad: 48px; }
+    @media (max-width: 768px) { :root { --page-pad: 16px; } }
+    @media (max-width: 380px) { :root { --page-pad: 12px; } }
     html, body {
       margin: 0; padding: 0;
       background: #0A0E0D; color: #D4D2CB;
@@ -30,15 +33,13 @@
 
     /* ===== Mobile overrides ===== */
     @media (max-width: 768px) {
-      /* Section outer padding: tighter to maximize content area */
-      main section {
+      /* Compact vertical padding on every centered container (section OR inner div).
+         Horizontal padding is handled by --page-pad on the inline style itself. */
+      main section,
+      main [style*="margin: 0 auto"],
+      main [style*="margin: 0px auto"] {
         padding-top: 44px !important;
         padding-bottom: 44px !important;
-      }
-      main section[style*="0 48px"],
-      main section > div[style*="0 48px"] {
-        padding-left: 16px !important;
-        padding-right: 16px !important;
       }
 
       /* Disable sticky positioning on mobile (testimonial author column, etc.) */

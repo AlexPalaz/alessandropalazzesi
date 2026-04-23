@@ -2,7 +2,7 @@
 
 const ContactPage = ({ onNavigate }) => {
   const { THEME, Reveal, CmdHeader } = window;
-  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 48px' };
+  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 var(--page-pad)' };
 
   const [form, setForm] = React.useState({
     name: '', company: '', email: '', project: 'architecture.audit',

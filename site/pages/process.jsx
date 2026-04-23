@@ -2,7 +2,7 @@
 
 const ProcessPage = ({ onNavigate }) => {
   const { THEME, Reveal, CmdHeader } = window;
-  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 48px' };
+  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 var(--page-pad)' };
 
   const steps = [
     { n: '00', fn: 'intro()', t: '30-min call', d: 'No pitch deck, no sales script. Tell me about your situation. I tell you if I\'m the right person — and if I\'m not, who might be. Outcome: yes / no / maybe later.', time: 'day 0' },

@@ -3,7 +3,7 @@
 const HomePage = ({ onNavigate }) => {
   const { THEME, Reveal, CmdHeader, CASE_STUDIES, COMPANIES } = window;
 
-  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 48px' };
+  const container = { maxWidth: 1280, margin: '0 auto', padding: '0 var(--page-pad)' };
 
   return (
     <>

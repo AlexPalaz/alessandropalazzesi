@@ -2,7 +2,7 @@
 
 const AboutPage = ({ onNavigate }) => {
   const { THEME, Reveal, CmdHeader } = window;
-  const container = { maxWidth: 1080, margin: '0 auto', padding: '0 48px' };
+  const container = { maxWidth: 1080, margin: '0 auto', padding: '0 var(--page-pad)' };
 
   return (
     <>
