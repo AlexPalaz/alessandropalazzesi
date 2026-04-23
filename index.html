@@ -30,40 +30,42 @@
 
     /* ===== Mobile overrides ===== */
     @media (max-width: 768px) {
-      /* Section paddings collapse */
+      /* Section outer padding: lighter horizontal, breathable vertical */
       main section {
-        padding-top: 56px !important;
-        padding-bottom: 56px !important;
+        padding-top: 64px !important;
+        padding-bottom: 64px !important;
       }
       main section[style*="0 48px"],
       main section > div[style*="0 48px"] {
-        padding-left: 20px !important;
-        padding-right: 20px !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
       }
 
       /* Collapse multi-column grids to a single column, except form label rows */
       main div[style*="grid-template-columns"]:not([style*="120px"]) {
         grid-template-columns: 1fr !important;
-        gap: 28px !important;
+        gap: 32px !important;
       }
       main div[style*="grid-template-columns: 120px"] {
-        grid-template-columns: 84px 1fr !important;
-        gap: 10px !important;
+        grid-template-columns: 88px 1fr !important;
+        gap: 12px !important;
       }
 
       /* Big headings scale */
       main h1 {
         font-size: clamp(38px, 11vw, 64px) !important;
-        line-height: 1.02 !important;
+        line-height: 1.04 !important;
         margin-bottom: 20px !important;
+        letter-spacing: -0.02em !important;
       }
       main h2 {
         font-size: clamp(26px, 7vw, 42px) !important;
         line-height: 1.1 !important;
       }
+      main p { font-size: 16px !important; }
 
       /* Testimonial quote */
-      main blockquote { font-size: 18px !important; line-height: 1.5 !important; }
+      main blockquote { font-size: 18px !important; line-height: 1.55 !important; }
 
       /* Button rows wrap (hero CTA, home CTA, contact channels) */
       main div[style*="justify-content: center"][style*="gap: 16px"],
@@ -78,12 +80,32 @@
         gap: 36px !important;
       }
 
-      /* Contact form box tighter padding */
-      main form,
-      main div[style*="padding: 40px"] {
+      /* Large inner-card paddings collapse so content has room to breathe */
+      main div[style*="padding: 40px"],
+      main div[style*="padding: 40"] {
+        padding: 22px !important;
+      }
+      main div[style*="padding: 32px"],
+      main div[style*="padding: 32"] {
         padding: 20px !important;
       }
-      main div[style*="padding: 40px"] form { padding: 0 !important; }
+      main form[onSubmit],
+      main form {
+        padding: 0 !important;
+      }
+      main div[style*="padding: 40px"] form,
+      main div[style*="padding: 40"] form { padding: 0 !important; }
+
+      /* Testimonials: tighten vertical rhythm */
+      main div[style*="padding: 72px 0"] {
+        padding: 40px 0 !important;
+      }
+
+      /* Case study body rows (label column + content) — let content flow */
+      main div[style*="grid-template-columns: 200px 1fr"],
+      main div[style*="grid-template-columns: 220px 1fr"] {
+        gap: 16px !important;
+      }
 
       /* Code-block hero: allow wrapping rather than overflowing */
       main div[style*="padding-left: 24px"] {
@@ -91,6 +113,10 @@
         overflow-wrap: anywhere;
         word-break: break-word;
       }
+
+      /* Reduce giant numbers (about page) so they don't wrap awkwardly */
+      main div[style*="font-size: 72px"] { font-size: 48px !important; }
+      main div[style*="font-size: 64px"] { font-size: 44px !important; }
 
       /* ---- Status bar (outside main) ---- */
       .status-bar { padding: 8px 14px !important; font-size: 10px !important; }
@@ -116,7 +142,7 @@
       .nav-cta { padding: 8px 12px !important; font-size: 11px !important; }
 
       /* ---- Footer ---- */
-      .site-footer { padding: 32px 20px !important; }
+      .site-footer { padding: 32px 18px !important; }
       .footer-grid {
         grid-template-columns: 1fr !important;
         gap: 28px !important;
@@ -128,6 +154,18 @@
         align-items: flex-start !important;
         font-size: 10px !important;
       }
+    }
+
+    /* ===== Ultra-narrow (phones <=380px) ===== */
+    @media (max-width: 380px) {
+      main section[style*="0 48px"],
+      main section > div[style*="0 48px"] {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+      }
+      main div[style*="padding: 40px"],
+      main div[style*="padding: 40"] { padding: 18px !important; }
+      main h1 { font-size: clamp(34px, 10.5vw, 52px) !important; }
     }
   </style>
 
