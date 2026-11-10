@@ -32,7 +32,7 @@ export const en = {
   stack: {
     kicker: "Stack",
     groups: [
-      { label: "AI", items: ["RAG", "Retrieval pipelines", "AI chatbots"] },
+      { label: "AI", items: ["RAG", "Retrieval pipelines", "AI chatbots", "Python"] },
       { label: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Angular", "React Native"] },
       { label: "Backend", items: [".NET 8", "C#", "Node.js", "NestJS", "SQL Server", "MongoDB"] },
       { label: "Delivery", items: ["GitHub Actions", "Azure DevOps", "Git", "Agile"] },

@@ -34,7 +34,7 @@ export const it: Dictionary = {
   stack: {
     kicker: "Stack",
     groups: [
-      { label: "AI", items: ["RAG", "Pipeline di retrieval", "Chatbot AI"] },
+      { label: "AI", items: ["RAG", "Pipeline di retrieval", "Chatbot AI", "Python"] },
       { label: "Frontend", items: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Angular", "React Native"] },
       { label: "Backend", items: [".NET 8", "C#", "Node.js", "NestJS", "SQL Server", "MongoDB"] },
       { label: "Consegna", items: ["GitHub Actions", "Azure DevOps", "Git", "Agile"] },
