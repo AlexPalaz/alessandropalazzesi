@@ -200,10 +200,24 @@ export function Particles({ count }: { count: number }) {
       camera.updateProjectionMatrix();
     }
 
-    if (!reduced) spin.current += s.spin * delta;
-    // Scenes with no idle turn (the wave field) must sit square to the camera,
-    // so the accumulated turn fades out as the shot's spin goes to zero.
-    const turn = spin.current * Math.min(s.spin / 0.02, 1);
+    // Idle turn. Scenes with no idle turn (the Lab's wave field) must sit square
+    // to the camera, so on the way into one the turn is wound back to zero, in
+    // step with the flight. The angle is kept within half a turn either way (a
+    // full turn looks the same, so wrapping is invisible): what gets wound back
+    // is never more than that, however long the page has been open.
+    let still = 0;
+    for (let i = 0; i < rig.length; i++) {
+      if (rig[i].spin === 0) still = Math.max(still, 1 - Math.abs(t - i));
+    }
+    still = Math.max(0, still);
+    if (reduced) {
+      spin.current = 0;
+    } else if (still === 0) {
+      // Only turn (and wrap) away from a still scene, so the winding back is smooth.
+      spin.current += s.spin * delta;
+      spin.current -= Math.round(spin.current / (2 * Math.PI)) * 2 * Math.PI;
+    }
+    const turn = spin.current * (1 - still * still * (3 - 2 * still));
     points.current?.rotation.set(s.rotX, s.rotY + turn, 0);
 
     u.uT.value = t;
