@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Alessandro Palazzesi — Creative AI engineer</title>
+    <meta name="description" content="Alessandro Palazzesi, full-stack software engineer and technical lead in Turin." />
+    <meta name="robots" content="noindex" />
+    <!-- The site has no server, so the language is chosen here: Italian for
+         Italian browsers, English for everyone else. Paths are relative, so
+         this works under any base path. -->
+    <script>
+      var languages = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+      var italian = String(languages[0]).toLowerCase().indexOf("it") === 0;
+      location.replace((italian ? "it/" : "en/") + location.search + location.hash);
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=en/" /></noscript>
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0c10; color: #f4f4f2; font: 16px/1.5 system-ui, sans-serif; }
+      a { color: #6f86ff; }
+    </style>
+  </head>
+  <body>
+    <p><a href="en/">English</a> · <a href="it/">Italiano</a></p>
+  </body>
+</html>

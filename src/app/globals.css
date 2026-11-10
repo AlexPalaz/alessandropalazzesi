@@ -1,0 +1,83 @@
+@import "tailwindcss";
+@import "lenis/dist/lenis.css";
+
+/* Ink and cobalt on paper. Light first, dark ready: every colour is a token. */
+:root {
+  --paper: #f4f4f2;
+  --tile: #ebebe7;
+  --ink: #141416;
+  --body: #2b2b30;
+  --muted: #5c5c64;
+  --cobalt: #2440d8;
+  --rule: rgba(20, 20, 22, 0.25);
+  /* Read by the WebGL stage (src/stage/Particles.tsx). */
+  --stage-dot: #2440d8;
+  --stage-ink: #141416;
+  --stage-invert: 0;
+}
+
+:root[data-theme="dark"] {
+  --paper: #0b0c10;
+  --tile: #15171d;
+  --ink: #f4f4f2;
+  --body: #d6d7dc;
+  --muted: #a5a7b0;
+  --cobalt: #6f86ff;
+  --rule: rgba(244, 244, 242, 0.25);
+  --stage-dot: #5b76ff;
+  --stage-ink: #f4f4f2;
+  --stage-invert: 1;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-tile: var(--tile);
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-cobalt: var(--cobalt);
+  --color-rule: var(--rule);
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html {
+  background: var(--paper);
+  color: var(--ink);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--cobalt);
+  color: var(--paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--cobalt);
+  outline-offset: 3px;
+}
+
+.kicker {
+  font-family: var(--font-jetbrains-mono), monospace;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cobalt);
+}
+
+.display {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
