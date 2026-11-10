@@ -14,6 +14,8 @@ export const en = {
     themeToDark: "Switch to dark theme",
     themeToLight: "Switch to light theme",
     skip: "Skip to content",
+    menuOpen: "Open the menu",
+    menuClose: "Close the menu",
   },
   hero: {
     kicker: "Independent creative AI engineer",

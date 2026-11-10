@@ -16,6 +16,8 @@ export const it: Dictionary = {
     themeToDark: "Passa al tema scuro",
     themeToLight: "Passa al tema chiaro",
     skip: "Vai al contenuto",
+    menuOpen: "Apri il menu",
+    menuClose: "Chiudi il menu",
   },
   hero: {
     kicker: "Creative AI engineer indipendente",

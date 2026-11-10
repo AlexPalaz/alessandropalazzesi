@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Dictionary, Locale } from "@/i18n";
+import { MobileMenu } from "./MobileMenu";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header({ dict, lang }: { dict: Dictionary; lang: Locale }) {
@@ -30,7 +31,7 @@ export function Header({ dict, lang }: { dict: Dictionary; lang: Locale }) {
           <span className="hidden lg:inline">Alessandro Palazzesi</span>
           <span className="text-cobalt">.</span>
         </a>
-        <nav className="flex items-center gap-4 font-mono text-[13px] md:gap-9">
+        <nav className="flex items-center gap-3 font-mono text-[13px] md:gap-9">
           {links.map((link) => (
             <a
               key={link.href}
@@ -49,6 +50,7 @@ export function Header({ dict, lang }: { dict: Dictionary; lang: Locale }) {
             {dict.nav.otherLang}
           </Link>
           <ThemeToggle toDark={dict.nav.themeToDark} toLight={dict.nav.themeToLight} />
+          <MobileMenu links={links} openLabel={dict.nav.menuOpen} closeLabel={dict.nav.menuClose} />
         </nav>
       </div>
     </header>

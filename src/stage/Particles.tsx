@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { COMPACT_WIDTH, RIGS, emptyShot, frameShot, sampleShot } from "./director";
+import { COMPACT_WIDTH, RIGS, emptyShot, frameShot, frameSlot, sampleShot } from "./director";
 import { DOT, buildFormations } from "./formations";
 import { fragmentShader, vertexShader } from "./shaders";
 import { stage } from "./state";
@@ -20,12 +20,29 @@ function uniformsOf(object: THREE.Points | null) {
   return object ? (object.material as THREE.ShaderMaterial).uniforms : null;
 }
 
+/**
+ * Where scene `index`'s slot sits in the window right now, or null when the
+ * page has none on show (wide windows hide them). Elements are looked up once.
+ */
+function slotBox(cache: (HTMLElement | null)[], index: number) {
+  let element = cache[index];
+  if (!element || !element.isConnected) {
+    element = document.querySelector<HTMLElement>(`[data-stage-slot="${index}"]`);
+    cache[index] = element;
+  }
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  return rect.height > 0 ? { top: rect.top, height: rect.height } : null;
+}
+
 export function Particles({ count }: { count: number }) {
   const points = useRef<THREE.Points>(null);
   const shot = useRef(emptyShot());
   const spin = useRef(0);
   const light = useRef(new THREE.Vector2());
   const slow = useRef({ frames: 0, time: 0 });
+  const slots = useRef<(HTMLElement | null)[]>([]);
+  const maskNow = useRef("none");
 
   const geometry = useMemo(() => {
     const f = buildFormations(count);
@@ -107,16 +124,16 @@ export function Particles({ count }: { count: number }) {
   useFrame((state, delta) => {
     const camera = state.camera as THREE.PerspectiveCamera;
     const { width, height } = state.size;
-    const portrait = width < COMPACT_WIDTH || width / height < 0.85;
+    const compact = width < COMPACT_WIDTH;
     const reduced = stage.reduced;
     const u = uniformsOf(points.current);
     if (!u) return;
 
     const t = reduced ? Math.round(stage.t) : stage.t;
-    const rig = portrait ? RIGS.compact : RIGS.desktop;
+    const rig = compact ? RIGS.compact : RIGS.desktop;
     const s = sampleShot(rig, t, shot.current);
-    const frame = frameShot(s, width / height);
     const intro = reduced ? 1 : stage.intro;
+    const aspect = width / height;
 
     // Pointer: eased, moves the light and nudges the camera for parallax.
     const ease = 1 - Math.exp(-delta * 4);
@@ -125,10 +142,59 @@ export function Particles({ count }: { count: number }) {
     const px = reduced ? 0 : light.current.x;
     const py = reduced ? 0 : light.current.y;
 
-    // In the Lab the route must stay lined up with its captions, so the camera holds still there.
-    const loose = 1 - Math.max(0, 1 - Math.abs(t - 3));
-    camera.position.set(frame.x + px * 0.14 * loose, s.y + py * 0.1 * loose, frame.z);
-    camera.lookAt(frame.x, s.targetY, 0);
+    let focus: number;
+    let tan: number;
+    let labHalf: number;
+    let mask = "none";
+    let shown = 1;
+
+    if (compact) {
+      // Narrow windows: the scene is drawn inside its slot, a box of the page
+      // kept free of text, and masked to it. The slot scrolls with the page, so
+      // the animation does too. A scene moves to the next slot as soon as its
+      // section starts to open; at that moment both slots are off screen.
+      const last = rig.length - 1;
+      const active = Math.min(last, Math.max(0, Math.ceil(t - 0.02)));
+      const box = slotBox(slots.current, active);
+      if (box) {
+        const frame = frameSlot(s, box, width, height);
+        camera.position.set(0, frame.y + (s.y - s.targetY), frame.z);
+        camera.lookAt(0, frame.y, 0);
+        focus = frame.z;
+        tan = frame.tan;
+        const fade = Math.min(32, box.height / 4);
+        const top = Math.round(box.top);
+        const bottom = Math.round(box.top + box.height);
+        mask = `linear-gradient(to bottom, transparent ${top}px, #000 ${top + fade}px, #000 ${bottom - fade}px, transparent ${bottom}px)`;
+      } else {
+        // No slot for this scene: draw nothing rather than run behind the copy.
+        focus = s.z;
+        tan = Math.tan((s.fov * Math.PI) / 360);
+        shown = 0;
+      }
+      const labBox = slotBox(slots.current, 3) ?? { top: 0, height: height * 0.32 };
+      labHalf = frameSlot(rig[3], labBox, width, height).z * Math.tan((rig[3].fov * Math.PI) / 360) * aspect;
+    } else {
+      const frame = frameShot(s, aspect);
+      // In the Lab the route must stay lined up with its captions, so the camera holds still there.
+      const loose = 1 - Math.max(0, 1 - Math.abs(t - 3));
+      camera.position.set(frame.x + px * 0.14 * loose, s.y + py * 0.1 * loose, frame.z);
+      camera.lookAt(frame.x, s.targetY, 0);
+      focus = frame.z;
+      tan = frame.tan;
+      // Lab: half the screen width at the route's plane, in world units.
+      const lab = rig[3];
+      const labFrame = frameShot(lab, aspect);
+      labHalf = Math.hypot(labFrame.z, lab.y - lab.targetY) * labFrame.tan * aspect;
+    }
+
+    const canvas = state.gl.domElement;
+    if (maskNow.current !== mask) {
+      maskNow.current = mask;
+      canvas.style.maskImage = mask;
+      canvas.style.setProperty("-webkit-mask-image", mask);
+    }
+
     if (camera.fov !== s.fov) {
       camera.fov = s.fov;
       camera.updateProjectionMatrix();
@@ -143,24 +209,15 @@ export function Particles({ count }: { count: number }) {
     u.uT.value = t;
     if (!reduced) u.uTime.value += delta;
     u.uLight.value.set(-0.52 + px * 0.7, 0.62 + py * 0.7, 0.59);
-    u.uFocus.value = frame.z;
+    u.uFocus.value = focus;
     u.uIntro.value = intro;
-
-    // Lab: size the scene to this window. Half the screen width at the route's
-    // plane, then the route's start and step in the same world units.
-    const lab = rig[3];
-    const labFrame = frameShot(lab, width / height);
-    const labHalf = Math.hypot(labFrame.z, lab.y - lab.targetY) * labFrame.tan * (width / height);
+    // Lab: the route's start and step, in the same world units as the half-width.
     u.uLab.value.set(labHalf, stage.route.x0 * labHalf, stage.route.step * labHalf);
-    // Portrait: the subject shares the column with the copy, so it steps back
-    // to a faint texture while the text-heavy scenes (1 to 3) are on screen.
-    const reading = THREE.MathUtils.smoothstep(t, 0.2, 0.9) * (1 - THREE.MathUtils.smoothstep(t, 3.2, 3.9));
-    // The Lab's ground is dense: on narrow screens it steps back further still.
-    const inLab = Math.max(0, 1 - Math.abs(t - 3));
-    // Between two scenes the cloud crosses the copy: it thins out while it does.
+    // Between two scenes the cloud thins out. Wide windows more, because there
+    // it crosses the copy; in a slot it has the space to itself.
     const inFlight = Math.sin((t - Math.floor(t)) * Math.PI);
-    u.uOpacity.value = (portrait ? (0.7 - 0.52 * reading) * (1 - 0.65 * inLab) : 1) * (1 - 0.6 * inFlight);
-    u.uPx.value = (DOT * height * state.gl.getPixelRatio()) / (2 * frame.tan);
+    u.uOpacity.value = shown * (1 - (compact ? 0.3 : 0.6) * inFlight);
+    u.uPx.value = (DOT * height * state.gl.getPixelRatio()) / (2 * tan);
 
     // Adaptive rendering: if the frame rate stays low, step the resolution down.
     const watch = slow.current;

@@ -26,6 +26,16 @@ function Title({
   );
 }
 
+/**
+ * Narrow screens only: the stretch of the page kept free for the 3D of scene
+ * `scene`. The stage draws that scene inside this box and nowhere else, so the
+ * animation scrolls with the page and is never behind text. Wide screens place
+ * the subject beside the copy instead, and this box is not rendered.
+ */
+function StageSlot({ scene, className }: { scene: number; className: string }) {
+  return <div data-stage-slot={scene} aria-hidden="true" className={`xl:hidden ${className}`} />;
+}
+
 const SECTION_COUNT = 5;
 
 function SceneIndex({ index }: { index: number }) {
@@ -40,7 +50,8 @@ export function Hero({ dict }: { dict: Dictionary }) {
   const { hero } = dict;
   return (
     <section id="top" data-scene="0" className="relative flex min-h-svh flex-col">
-      <div className={`${wrap} flex flex-1 flex-col justify-end pt-[46svh] pb-10 md:justify-center md:pt-[120px] md:pb-8`}>
+      <StageSlot scene={0} className="mt-16 h-[42svh] md:mt-[88px]" />
+      <div className={`${wrap} flex flex-1 flex-col justify-end pt-5 pb-10 xl:justify-center xl:pt-[120px] xl:pb-8`}>
         <div className="flex max-w-[860px] flex-col gap-6 md:gap-7">
           <p className="kicker">{hero.kicker}</p>
           <Title as="h1" lines={hero.title} className="text-[clamp(3.25rem,8.6vw,7.75rem)]" />
@@ -65,18 +76,18 @@ export function Hero({ dict }: { dict: Dictionary }) {
       {/* Solid ground: the particles in flight pass behind this bar, never over its text. */}
       <div className="relative bg-paper">
        <div className={wrap}>
-        <div className="flex flex-col gap-5 border-t border-ink py-6 md:flex-row md:items-center md:justify-between md:gap-8 md:py-8">
-          <dl className="grid grid-cols-1 gap-x-10 gap-y-3 sm:grid-cols-3 md:flex md:gap-x-12">
+        <div className="flex flex-col gap-5 border-t border-ink py-6 xl:flex-row xl:items-center xl:justify-between xl:gap-8 xl:py-8">
+          <dl className="grid grid-cols-3 gap-x-4 xl:flex xl:gap-x-12">
             {hero.stats.map((stat) => (
-              <div key={stat.value} className="flex flex-col-reverse gap-1 sm:flex-row-reverse sm:items-baseline sm:justify-end sm:gap-3">
-                <dt className="text-sm text-muted">{stat.label}</dt>
-                <dd className="font-display text-2xl font-semibold tracking-[-0.02em] text-cobalt md:text-[28px]">
+              <div key={stat.value} className="flex flex-col-reverse justify-end gap-1 xl:flex-row-reverse xl:items-baseline xl:gap-3">
+                <dt className="text-xs leading-snug text-muted sm:text-sm">{stat.label}</dt>
+                <dd className="font-display text-[17px] font-semibold tracking-[-0.02em] whitespace-nowrap text-cobalt sm:text-2xl xl:text-[28px]">
                   {stat.value}
                 </dd>
               </div>
             ))}
           </dl>
-          <ul className="flex items-center gap-3">
+          <ul className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
             {[
               { href: site.github, name: "GitHub", label: dict.stack.github },
               { href: site.linkedin, name: "LinkedIn", label: dict.stack.linkedin },
@@ -89,7 +100,7 @@ export function Hero({ dict }: { dict: Dictionary }) {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={profile.label}
-                    className="inline-flex h-11 items-center gap-2.5 rounded-full border border-ink px-5 text-sm font-semibold transition-colors hover:border-cobalt hover:text-cobalt"
+                    className="flex h-11 items-center justify-between gap-2.5 rounded-full border border-ink px-5 text-sm font-semibold transition-colors hover:border-cobalt hover:text-cobalt"
                   >
                     {profile.name}
                     <ArrowOut />
@@ -187,7 +198,8 @@ export function Services({ dict }: { dict: Dictionary }) {
             <SceneIndex index={1} />
           </div>
           <Title lines={services.title} className="text-[clamp(2.5rem,4.4vw,3.75rem)] leading-none" />
-          <ol className="mt-2 border-t border-ink">
+          <StageSlot scene={1} className="h-[40svh]" />
+          <ol className="border-t border-ink xl:mt-2">
             {services.items.map((item, index) => (
               <li key={item.name} className="flex gap-5 border-b border-rule py-3.5">
                 <span className="w-7 shrink-0 pt-2 font-mono text-[13px] text-cobalt">
@@ -220,7 +232,8 @@ export function Clients({ dict }: { dict: Dictionary }) {
             <SceneIndex index={2} />
           </div>
           <Title lines={clients.title} className="text-[clamp(2.5rem,4.4vw,3.75rem)] leading-none" />
-          <ol className="mt-3 border-t border-ink">
+          <StageSlot scene={2} className="h-[40svh]" />
+          <ol className="border-t border-ink xl:mt-3">
             {clients.items.map((client, index) => (
               <li
                 key={client.name}
@@ -283,7 +296,9 @@ export function Lab({ dict }: { dict: Dictionary }) {
         </div>
       </div>
 
-      <div className="relative mt-10 bg-paper xl:mt-0">
+      <StageSlot scene={3} className="mt-4 h-[32svh]" />
+
+      <div className="relative bg-paper">
         <ol className={`${wrap} grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4`}>
           {lab.steps.map((step, index) => (
             <li key={step.name} className="relative flex flex-col gap-2 border-t border-ink pt-7 pr-8 pb-8 xl:pb-10">
@@ -317,7 +332,8 @@ export function Contact({ dict }: { dict: Dictionary }) {
   const { contact } = dict;
   return (
     <section id="contact" data-scene="4" className="relative flex min-h-svh flex-col">
-      <div className={`${wrap} flex flex-1 flex-col justify-end pt-[46svh] pb-12 md:justify-center md:pt-[120px]`}>
+      <StageSlot scene={4} className="mt-16 h-[34svh] md:mt-[88px]" />
+      <div className={`${wrap} flex flex-1 flex-col justify-end pt-5 pb-12 xl:justify-center xl:pt-[120px]`}>
         <div className="flex max-w-[900px] flex-col gap-7 md:gap-9">
           <div className="flex items-baseline gap-6">
             <p className="kicker">{contact.kicker}</p>
