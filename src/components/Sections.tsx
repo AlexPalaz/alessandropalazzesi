@@ -1,5 +1,6 @@
 import type { Dictionary } from "@/i18n";
 import { site } from "@/site.config";
+import { CopyEmail } from "./CopyEmail";
 
 const wrap = "mx-auto w-full max-w-[1440px] px-5 md:px-16";
 
@@ -325,12 +326,13 @@ export function Contact({ dict }: { dict: Dictionary }) {
           <Title lines={contact.title} className="text-[clamp(3rem,7.8vw,7rem)]" />
           <div className="flex flex-col gap-3">
             {site.email && (
-              <a
-                href={`mailto:${site.email}`}
-                className="self-start py-2 font-display text-2xl font-medium tracking-[-0.02em] underline underline-offset-8 transition-colors hover:text-cobalt md:text-[34px]"
-              >
-                {contact.email}
-              </a>
+              <div className="flex flex-col gap-2 pb-2">
+                <p className="font-display text-2xl font-medium tracking-[-0.02em] md:text-[34px]">{contact.email}</p>
+                <CopyEmail
+                  email={site.email}
+                  labels={{ copy: contact.copy, copied: contact.copied, copyLabel: contact.copyLabel }}
+                />
+              </div>
             )}
             <a
               href={site.linkedin}
