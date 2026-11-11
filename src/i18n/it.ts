@@ -115,7 +115,7 @@ export const it: Dictionary = {
       },
       {
         years: "2018 — 2023",
-        name: "Enhancers",
+        name: "Enhancers - Tinexta Group",
         desc: "Studio torinese di prodotto digitale per esperienze connesse, IoT e mobile.",
         role: "Technical Lead",
       },

@@ -113,7 +113,7 @@ export const en = {
       },
       {
         years: "2018 — 2023",
-        name: "Enhancers",
+        name: "Enhancers - Tinexta Group",
         desc: "A Turin digital product studio for connected, IoT and mobile experiences.",
         role: "Technical Lead",
       },
