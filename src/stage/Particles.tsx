@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { COMPACT_WIDTH, RIGS, emptyShot, frameShot, frameSlot, sampleShot } from "./director";
+import { COMPACT_WIDTH, LAB_SCENE, RIGS, emptyShot, frameShot, frameSlot, sampleShot } from "./director";
 import { DOT, buildFormations } from "./formations";
 import { fragmentShader, vertexShader } from "./shaders";
 import { stage } from "./state";
@@ -49,13 +49,15 @@ export function Particles({ count }: { count: number }) {
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(f.sphere, 3));
     g.setAttribute("aAgents", new THREE.BufferAttribute(f.agents, 3));
-    g.setAttribute("aLattice", new THREE.BufferAttribute(f.lattice, 3));
+    g.setAttribute("aCarve", new THREE.BufferAttribute(f.carve, 3));
+    g.setAttribute("aCarveInfo", new THREE.BufferAttribute(f.carveInfo, 3));
+    g.setAttribute("aTower", new THREE.BufferAttribute(f.tower, 4));
+    g.setAttribute("aTowerInfo", new THREE.BufferAttribute(f.towerInfo, 3));
     g.setAttribute("aTerrain", new THREE.BufferAttribute(f.terrain, 3));
     g.setAttribute("aPoint", new THREE.BufferAttribute(f.point, 3));
     g.setAttribute("aSizeA", new THREE.BufferAttribute(f.sizeA, 4));
     g.setAttribute("aSizeB", new THREE.BufferAttribute(f.sizeB, 1));
     g.setAttribute("aSeed", new THREE.BufferAttribute(f.seed, 1));
-    g.setAttribute("aInk", new THREE.BufferAttribute(f.ink, 1));
     g.setAttribute("aTone", new THREE.BufferAttribute(f.tone, 1));
     g.setAttribute("aFlow", new THREE.BufferAttribute(f.flow, 1));
     g.setAttribute("aLab", new THREE.BufferAttribute(f.lab, 4));
@@ -172,18 +174,18 @@ export function Particles({ count }: { count: number }) {
         tan = Math.tan((s.fov * Math.PI) / 360);
         shown = 0;
       }
-      const labBox = slotBox(slots.current, 3) ?? { top: 0, height: height * 0.32 };
-      labHalf = frameSlot(rig[3], labBox, width, height).z * Math.tan((rig[3].fov * Math.PI) / 360) * aspect;
+      const labBox = slotBox(slots.current, LAB_SCENE) ?? { top: 0, height: height * 0.32 };
+      labHalf = frameSlot(rig[LAB_SCENE], labBox, width, height).z * Math.tan((rig[LAB_SCENE].fov * Math.PI) / 360) * aspect;
     } else {
       const frame = frameShot(s, aspect);
       // In the Lab the route must stay lined up with its captions, so the camera holds still there.
-      const loose = 1 - Math.max(0, 1 - Math.abs(t - 3));
+      const loose = 1 - Math.max(0, 1 - Math.abs(t - LAB_SCENE));
       camera.position.set(frame.x + px * 0.14 * loose, s.y + py * 0.1 * loose, frame.z);
       camera.lookAt(frame.x, s.targetY, 0);
       focus = frame.z;
       tan = frame.tan;
       // Lab: half the screen width at the route's plane, in world units.
-      const lab = rig[3];
+      const lab = rig[LAB_SCENE];
       const labFrame = frameShot(lab, aspect);
       labHalf = Math.hypot(labFrame.z, lab.y - lab.targetY) * labFrame.tan * aspect;
     }

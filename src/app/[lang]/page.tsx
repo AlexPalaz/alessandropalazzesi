@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Header } from "@/components/Header";
-import { Clients, Contact, Hero, Lab, Services, Stack } from "@/components/Sections";
+import { Clients, Contact, Hero, Lab, Principles, Services, Stack } from "@/components/Sections";
 import { getDictionary, hasLocale } from "@/i18n";
 
 export default async function Page({ params }: PageProps<"/[lang]">) {
@@ -15,6 +15,7 @@ export default async function Page({ params }: PageProps<"/[lang]">) {
         <Hero dict={dict} />
         <Stack dict={dict} />
         <Services dict={dict} />
+        <Principles dict={dict} />
         <Clients dict={dict} />
         <Lab dict={dict} />
         <Contact dict={dict} />

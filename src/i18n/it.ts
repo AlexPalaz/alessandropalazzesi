@@ -68,9 +68,32 @@ export const it: Dictionary = {
       },
     ],
   },
+  principles: {
+    kicker: "Principi",
+    title: ["L'ingegneria", "non è più solo", "costruire"],
+    body: "Alcuni principi che guidano il mio modo di affrontare software, AI e leadership tecnica.",
+    items: [
+      {
+        name: "La produzione è il vero banco di prova.",
+        desc: "Un prototipo dimostra che si può fare. La produzione dimostra l'ingegneria.",
+      },
+      {
+        name: "La complessità è un costo, non un traguardo.",
+        desc: "L'architettura migliore è quella che risolve il problema senza crearne di nuovi inutilmente.",
+      },
+      {
+        name: "L'AI è una capacità, non un'architettura.",
+        desc: "Si parte dal problema. L'intelligenza va introdotta dove crea valore misurabile.",
+      },
+      {
+        name: "La leadership tecnica è una questione di leva.",
+        desc: "Un bravo technical lead rende migliore tutto il team, non solo il codice.",
+      },
+    ],
+  },
   clients: {
     kicker: "Esperienza",
-    title: ["Per chi ho costruito"],
+    title: ["Con chi ho lavorato"],
     items: [
       {
         years: "2025 — oggi",

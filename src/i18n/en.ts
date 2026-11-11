@@ -66,9 +66,32 @@ export const en = {
       },
     ],
   },
+  principles: {
+    kicker: "Principles",
+    title: ["Engineering is", "no longer just", "about building"],
+    body: "A few principles that shape how I approach software, AI and technical leadership.",
+    items: [
+      {
+        name: "Production is the real benchmark.",
+        desc: "A prototype proves possibility. Production proves engineering.",
+      },
+      {
+        name: "Complexity is a cost, not an achievement.",
+        desc: "The best architecture is the one that solves the problem without creating unnecessary new ones.",
+      },
+      {
+        name: "AI is a capability, not an architecture.",
+        desc: "Start with the problem. Introduce intelligence where it creates measurable value.",
+      },
+      {
+        name: "Technical leadership is about leverage.",
+        desc: "A great technical lead makes the entire team better, not just the codebase.",
+      },
+    ],
+  },
   clients: {
     kicker: "Experience",
-    title: ["Who I've built for"],
+    title: ["Who I've worked with"],
     items: [
       {
         years: "2025 — now",

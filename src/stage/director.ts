@@ -38,12 +38,14 @@ const desktop: Shot[] = [
   // 1 Services: the sphere has become an orchestration graph (core, four agents,
   // their tools). Right half, clear of the list, turning slowly.
   { z: 6.4, y: 0, targetY: 0, fov: 34, frameX: 0.55, extent: 1.5, extentY: 1.5, centerY: 0, span: 0.41, rotX: 0.2, rotY: 0.3, spin: 0.04 },
-  // 2 Clients: three-quarter view of the lattice, right third.
-  { z: 8.2, y: 0, targetY: 0, fov: 34, frameX: 0.61, extent: 1.55, extentY: 1.55, centerY: 0, span: 0.31, rotX: 0.46, rotY: 0.62, spin: 0.03 },
-  // 3 Lab: square on to the route, low over the waves. Centred and never pulled
+  // 2 Principles: the mostly empty frame with its four built cells, right half.
+  { z: 7.2, y: 0, targetY: 0, fov: 34, frameX: 0.58, extent: 1.75, extentY: 1.75, centerY: 0, span: 0.36, rotX: 0.38, rotY: 0.6, spin: 0.045 },
+  // 3 Clients: the diamond, upright, seen from a little above so its squares show. Right third.
+  { z: 6.5, y: 0.1, targetY: 0.1, fov: 34, frameX: 0.61, extent: 1.0, extentY: 1.6, centerY: 0, span: 0.31, rotX: 0.26, rotY: 0.35, spin: 0.08 },
+  // 4 Lab: square on to the route, low over the waves. Centred and never pulled
   // back (the scene sizes itself to the window in the shader).
   { z: 6.2, y: 0.55, targetY: 0.1, fov: 34, frameX: 0, extent: 1, extentY: 1, centerY: 0, span: 4, rotX: 0, rotY: 0, spin: 0 },
-  // 4 Contact: everything condenses into the point.
+  // 5 Contact: everything condenses into the point.
   { z: 4.9, y: 0.1, targetY: 0.1, fov: 34, frameX: 0.56, extent: 1.1, extentY: 1.1, centerY: 0, span: 0.42, rotX: 0.42, rotY: 0, spin: 0.12 },
 ];
 
@@ -54,7 +56,8 @@ const desktop: Shot[] = [
 const compact: Shot[] = [
   { z: 5, y: 0, targetY: 0, fov: 34, frameX: 0, extent: 1.12, extentY: 1.12, centerY: 0, span: 1, rotX: -0.3, rotY: 0.55, spin: 0.05 },
   { z: 5, y: 0, targetY: 0, fov: 34, frameX: 0, extent: 1.55, extentY: 1.5, centerY: 0, span: 1, rotX: 0.2, rotY: 0.3, spin: 0.04 },
-  { z: 5, y: 0, targetY: 0, fov: 34, frameX: 0, extent: 1.7, extentY: 1.6, centerY: 0, span: 1, rotX: 0.46, rotY: 0.62, spin: 0.03 },
+  { z: 5, y: 0, targetY: 0, fov: 34, frameX: 0, extent: 1.6, extentY: 1.5, centerY: 0, span: 1, rotX: 0.38, rotY: 0.6, spin: 0.045 },
+  { z: 5, y: 0, targetY: 0, fov: 34, frameX: 0, extent: 1.15, extentY: 1.6, centerY: 0, span: 1, rotX: 0.26, rotY: 0.35, spin: 0.08 },
   // The Lab sizes itself to the window across, so only its height limits it.
   { z: 5, y: 0.45, targetY: 0, fov: 34, frameX: 0, extent: 0.05, extentY: 0.62, centerY: -0.08, span: 1, rotX: 0, rotY: 0, spin: 0 },
   // The disc is tilted further towards the viewer than on wide screens, to fill its box.
@@ -62,6 +65,9 @@ const compact: Shot[] = [
 ];
 
 export const RIGS = { desktop, compact };
+
+/** The scene whose route must line up with its captions. */
+export const LAB_SCENE = 4;
 
 /** Below this width the copy needs the full column: scenes move into their slots. */
 export const COMPACT_WIDTH = 1280;

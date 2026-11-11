@@ -36,7 +36,7 @@ function StageSlot({ scene, className }: { scene: number; className: string }) {
   return <div data-stage-slot={scene} aria-hidden="true" className={`xl:hidden ${className}`} />;
 }
 
-const SECTION_COUNT = 5;
+const SECTION_COUNT = 6;
 
 function SceneIndex({ index }: { index: number }) {
   return (
@@ -221,18 +221,56 @@ export function Services({ dict }: { dict: Dictionary }) {
   );
 }
 
+/**
+ * Principles: what not to build. The stage draws a frame of cells left almost
+ * empty, with four built blocks, one per principle, lighting up in turn.
+ */
+export function Principles({ dict }: { dict: Dictionary }) {
+  const { principles } = dict;
+  return (
+    <section id="principles" data-scene="2" className="relative flex min-h-svh items-center pt-24 pb-8 md:pt-24">
+      <div className={wrap}>
+        <div className="flex max-w-[620px] flex-col gap-5">
+          <div className="flex items-baseline justify-between">
+            <p className="kicker">{principles.kicker}</p>
+            <SceneIndex index={2} />
+          </div>
+          <Title lines={principles.title} className="text-[clamp(2.5rem,4.4vw,3.75rem)] leading-none" />
+          <p className="max-w-[500px] text-base leading-[1.55] text-body md:text-[18px]">{principles.body}</p>
+          <StageSlot scene={2} className="h-[40svh]" />
+          <ol className="border-t border-ink xl:mt-2">
+            {principles.items.map((item, index) => (
+              <li key={item.name} className="flex gap-5 border-b border-rule py-3.5">
+                <span className="w-7 shrink-0 pt-1.5 font-mono text-[13px] text-cobalt">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="font-display text-[22px] leading-tight font-semibold tracking-[-0.02em] md:text-[24px]">
+                    {item.name}
+                  </h3>
+                  <p className="text-[15px] leading-normal text-body md:text-base">{item.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function Clients({ dict }: { dict: Dictionary }) {
   const { clients } = dict;
   return (
-    <section id="clients" data-scene="2" className="relative flex min-h-svh items-center pt-24 pb-10 md:pt-[104px]">
+    <section id="clients" data-scene="3" className="relative flex min-h-svh items-center pt-24 pb-10 md:pt-[104px]">
       <div className={wrap}>
         <div className="flex max-w-[816px] flex-col gap-6">
           <div className="flex items-baseline justify-between">
             <p className="kicker">{clients.kicker}</p>
-            <SceneIndex index={2} />
+            <SceneIndex index={3} />
           </div>
           <Title lines={clients.title} className="text-[clamp(2.5rem,4.4vw,3.75rem)] leading-none" />
-          <StageSlot scene={2} className="h-[40svh]" />
+          <StageSlot scene={3} className="h-[40svh]" />
           <ol className="border-t border-ink xl:mt-3">
             {clients.items.map((client, index) => (
               <li
@@ -271,13 +309,13 @@ export function Lab({ dict }: { dict: Dictionary }) {
   const { lab } = dict;
   const last = lab.steps.length - 1;
   return (
-    <section id="lab" data-scene="3" className="relative flex min-h-svh flex-col pt-24 md:pt-[112px]">
+    <section id="lab" data-scene="4" className="relative flex min-h-svh flex-col pt-24 md:pt-[112px]">
       <div className={`${wrap} flex flex-1 flex-col`}>
         <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between xl:gap-16">
           <div className="flex flex-col gap-4">
             <div className="flex items-baseline gap-6">
               <p className="kicker">{lab.kicker}</p>
-              <SceneIndex index={3} />
+              <SceneIndex index={4} />
             </div>
             <Title lines={lab.title} className="text-[clamp(2.5rem,4.4vw,3.75rem)] leading-none" />
           </div>
@@ -296,7 +334,7 @@ export function Lab({ dict }: { dict: Dictionary }) {
         </div>
       </div>
 
-      <StageSlot scene={3} className="mt-4 h-[32svh]" />
+      <StageSlot scene={4} className="mt-4 h-[32svh]" />
 
       <div className="relative bg-paper">
         <ol className={`${wrap} grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4`}>
@@ -331,13 +369,13 @@ export function Lab({ dict }: { dict: Dictionary }) {
 export function Contact({ dict }: { dict: Dictionary }) {
   const { contact } = dict;
   return (
-    <section id="contact" data-scene="4" className="relative flex min-h-svh flex-col">
-      <StageSlot scene={4} className="mt-16 h-[34svh] md:mt-[88px]" />
+    <section id="contact" data-scene="5" className="relative flex min-h-svh flex-col">
+      <StageSlot scene={5} className="mt-16 h-[34svh] md:mt-[88px]" />
       <div className={`${wrap} flex flex-1 flex-col justify-end pt-5 pb-12 xl:justify-center xl:pt-[120px]`}>
         <div className="flex max-w-[900px] flex-col gap-7 md:gap-9">
           <div className="flex items-baseline gap-6">
             <p className="kicker">{contact.kicker}</p>
-            <SceneIndex index={4} />
+            <SceneIndex index={5} />
           </div>
           <Title lines={contact.title} className="text-[clamp(3rem,7.8vw,7rem)]" />
           <div className="flex flex-col gap-3">

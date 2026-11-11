@@ -10,13 +10,18 @@ export const vertexShader = /* glsl */ `
   uniform vec3 uLab;
 
   attribute vec3 aAgents;
-  attribute vec3 aLattice;
+  attribute vec3 aCarve;
+  // Principles scene: dot size, ink or cobalt, and the turn of a built block in the pulse (0 for the rest).
+  attribute vec3 aCarveInfo;
+  // Clients scene: the seat with the diamond closed up, then ink (1) or cobalt (0).
+  attribute vec4 aTower;
+  // Clients scene: how far the particle's slice lifts and moves sideways as the diamond opens, and its turn in the pulse.
+  attribute vec3 aTowerInfo;
   attribute vec3 aTerrain;
   attribute vec3 aPoint;
   attribute vec4 aSizeA;
   attribute float aSizeB;
   attribute float aSeed;
-  attribute float aInk;
   attribute float aTone;
   attribute float aFlow;
   attribute vec4 aLab;
@@ -33,6 +38,7 @@ export const vertexShader = /* glsl */ `
     float w2 = leg(uT, 1.0);
     float w3 = leg(uT, 2.0);
     float w4 = leg(uT, 3.0);
+    float w5 = leg(uT, 4.0);
 
     // Lab: ground dots store x as a fraction of half the screen width; route
     // dots store the stop they belong to, plus a sideways offset.
@@ -44,24 +50,38 @@ export const vertexShader = /* glsl */ `
       + cos(terrain.z * 2.1 - uTime * 0.45 + terrain.x * 0.7) * 0.08
     );
 
+    // Clients: the diamond opens into its slices and closes again, slowly.
+    float apart = 0.5 + 0.5 * sin(uTime * 0.45);
+    vec3 diamond = aTower.xyz;
+    diamond.y += aTowerInfo.x * (0.045 + 0.075 * apart);
+    diamond.x += aTowerInfo.y * (0.06 + 0.06 * apart);
+
     vec3 p = position;
     p = mix(p, aAgents, w1);
-    p = mix(p, aLattice, w2);
-    p = mix(p, terrain, w3);
-    p = mix(p, aPoint, w4);
+    p = mix(p, aCarve, w2);
+    p = mix(p, diamond, w3);
+    p = mix(p, terrain, w4);
+    p = mix(p, aPoint, w5);
 
     float size = aSizeA.x;
     size = mix(size, aSizeA.y, w1);
-    size = mix(size, aSizeA.z, w2);
-    size = mix(size, aSizeA.w, w3);
-    size = mix(size, aSizeB, w4);
+    size = mix(size, aCarveInfo.x, w2);
+    size = mix(size, aSizeA.z, w3);
+    size = mix(size, aSizeA.w, w4);
+    size = mix(size, aSizeB, w5);
 
     // Agents scene: a pulse runs outwards along every link, like work being handed on.
     float pulse = pow(max(sin(6.2831853 * (aSeed * 1.5 - uTime * 0.3)), 0.0), 10.0);
     size *= 1.0 + aFlow * w1 * (1.0 - w2) * 2.2 * pulse;
+    // Principles scene: the four built blocks light up in turn, 01 to 04.
+    float blockPulse = pow(max(sin(6.2831853 * (aCarveInfo.z - uTime * 0.14)), 0.0), 6.0);
+    size *= 1.0 + step(0.01, aCarveInfo.z) * w2 * (1.0 - w3) * 0.55 * blockPulse;
+    // Clients scene: the slices light up in turn, from the first client to the tip still to be built.
+    float climb = pow(max(sin(6.2831853 * (aTowerInfo.z - uTime * 0.09)), 0.0), 6.0);
+    size *= 1.0 + step(0.01, aTowerInfo.z) * w3 * (1.0 - w4) * 0.8 * climb;
     // Lab scene: a pulse travels the route from start to arrival.
     float routePulse = pow(max(sin(6.2831853 * (aSeed * 2.0 - uTime * 0.22)), 0.0), 12.0);
-    size *= 1.0 + aLab.w * w3 * (1.0 - w4) * 2.6 * routePulse;
+    size *= 1.0 + aLab.w * w4 * (1.0 - w5) * 2.6 * routePulse;
 
     // Between two scenes the particles scatter before they find their new seat.
     float flight = sin(fract(uT) * 3.14159265);
@@ -70,8 +90,8 @@ export const vertexShader = /* glsl */ `
       cos(aSeed * 47.3 + uTime * 0.5),
       sin(aSeed * 23.1 - uTime * 0.6)
     );
-    // At rest the dots only breathe; the lattice (scene 2) holds still so its nodes stay crisp.
-    float breathe = 0.006 * (1.0 - w2 * (1.0 - w3));
+    // At rest the dots only breathe; the frame and the diamond (scenes 2 and 3) hold still so their lines stay crisp.
+    float breathe = 0.006 * (1.0 - w2 * (1.0 - w4));
     p += drift * (flight * 0.38 * (0.3 + aSeed) + breathe);
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
@@ -100,8 +120,8 @@ export const vertexShader = /* glsl */ `
     gl_PointSize = size * uPx / -mv.z;
     gl_Position = projectionMatrix * mv;
 
-    // Agents and Lab colour by role (aTone, aLab.z); the lattice uses the random mix (aInk).
-    vInk = mix(mix(aTone, aInk, w2), aLab.z, w3) * w1 * (1.0 - w4);
+    // Every scene after the sphere colours by role; the point is all cobalt.
+    vInk = mix(mix(mix(aTone, aCarveInfo.y, w2), aTower.w, w3), aLab.z, w4) * w1 * (1.0 - w5);
     // Particles behind the subject's centre fade, for depth.
     vAlpha = mix(1.0, 0.45, smoothstep(0.0, 2.2, -mv.z - uFocus));
     // A particle with no size in this shape is not drawn at all (GL would still give it a pixel).

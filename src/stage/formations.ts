@@ -1,16 +1,30 @@
 /**
- * The five shapes the same particles take, one per scene. Every particle has a
+ * The six shapes the same particles take, one per scene. Every particle has a
  * seat in every shape, so a scene change is a pure GPU blend between seats.
  */
 export type Formations = {
   count: number;
   sphere: Float32Array;
   agents: Float32Array;
-  lattice: Float32Array;
+  /** Principles scene: an empty frame with only four cells built. */
+  carve: Float32Array;
+  /** Principles scene, three values per particle: dot size, ink (1) or cobalt (0), and for the dots of a built block its turn in the pulse (0 for the rest). */
+  carveInfo: Float32Array;
+  /**
+   * Clients scene: a diamond cut into slices, one per client. Four values per
+   * particle: the seat with the slices closed up, then ink (1) or cobalt (0).
+   */
+  tower: Float32Array;
+  /**
+   * Clients scene, three values per particle: how far its slice lifts when the
+   * diamond opens, how far it moves sideways, and its slice's turn in the pulse
+   * (0 for the particles on no slice).
+   */
+  towerInfo: Float32Array;
   /** Lab scene. For route particles x is the stop number (0 to 3), not a position: see `lab`. */
   terrain: Float32Array;
   point: Float32Array;
-  /** Dot size in the first four shapes (x sphere, y agents, z lattice, w lab). */
+  /** Dot size in four of the shapes (x sphere, y agents, z tower, w lab). */
   sizeA: Float32Array;
   /** Dot size in the point shape. */
   sizeB: Float32Array;
@@ -111,6 +125,134 @@ const LINKS: { from: Vec3; to: Vec3; weight: number }[] = [
 const LINK_WEIGHT = LINKS.reduce((sum, link) => sum + link.weight, 0);
 
 /**
+ * Principles scene: "knowing what not to build". A cube drawn only by its
+ * edges, split into 3 x 3 x 3 cells by faint dotted lines: the space of all
+ * that could be built. Only four cells are solid, one per principle.
+ */
+const CARVE_HALF = 0.95;
+const CARVE_CELL = (CARVE_HALF * 2) / 3;
+const CARVE_BLOCK = 0.25;
+/** The four built cells (column, level, depth), from the lowest to the highest. */
+const CARVE_BUILT: Vec3[] = [
+  [0, 0, 2],
+  [2, 0, 1],
+  [1, 1, 0],
+  [1, 2, 2],
+];
+
+/**
+ * Clients scene: "who I've worked with". One diamond (an octahedron: a rhombus
+ * from every side, and a square wherever it is cut across), built from the
+ * bottom tip up. Height is time, so each client is a slice as tall as the
+ * years the work lasted, drawn as the squares it is made of, with a heavier
+ * one at every new year. Two clients served in the same years are the two
+ * halves of one slice. The latest slice is in cobalt and stops at today: the
+ * tip above it is only dotted, because it is still to be built.
+ */
+const DIAMOND_HEIGHT = 1.25;
+const DIAMOND_WIDTH = 0.85;
+/** The years the whole diamond spans, from 2017 at the bottom tip. */
+const DIAMOND_YEARS = 12;
+const TODAY = 9.9;
+/** Squares drawn per year. */
+const YEAR_ROWS = 5;
+/**
+ * From the first to the latest: the years it spans (0 is 2017), the sides of
+ * the square it takes (all four, or the two of its half), ink or cobalt, how
+ * far it lifts and moves sideways when the diamond opens, its turn in the pulse.
+ */
+const SLICES = [
+  { from: 0, to: 1, sides: [0, 1, 2, 3], ink: 1, lift: -1.5, shift: 0, turn: 1 }, // DM Group, 2017 to 2018
+  { from: 1, to: 6, sides: [0, 1, 2, 3], ink: 1, lift: -0.5, shift: 0, turn: 2 }, // Enhancers, 2018 to 2023
+  { from: 6, to: 8, sides: [3, 0], ink: 1, lift: 0.5, shift: 1, turn: 3 }, // Deltatre, 2023 to 2025
+  { from: 6, to: 8, sides: [1, 2], ink: 1, lift: 0.5, shift: -1, turn: 3 }, // Nuvem, 2023 to 2025
+  { from: 8, to: TODAY, sides: [0, 1, 2, 3], ink: 0, lift: 1.5, shift: 0, turn: 4 }, // Dipartimento per la trasformazione digitale, 2025 to today
+];
+/** The tip still to be built rides on the latest slice. */
+const TIP = { ink: 0, lift: 1.5, shift: 0, turn: 5 };
+const TURNS = 6;
+
+/** Corner `q` of the square the diamond makes at `year`: the corners sit on the x and z axes. */
+function diamondCorner(year: number, q: number): Vec3 {
+  const y = -DIAMOND_HEIGHT + (2 * DIAMOND_HEIGHT * year) / DIAMOND_YEARS;
+  const r = DIAMOND_WIDTH * (1 - Math.abs(y) / DIAMOND_HEIGHT);
+  const k = ((q % 4) + 4) % 4;
+  return [k === 0 ? r : k === 2 ? -r : 0, y, k === 1 ? r : k === 3 ? -r : 0];
+}
+
+type Site = { at: Vec3; size: number; ink: number; lift: number; shift: number; turn: number };
+type Stroke = { from: Vec3; to: Vec3; length: number; size: number; role: { ink: number; lift: number; shift: number; turn: number } };
+
+/**
+ * Every dot of the diamond, laid out along its lines. `budget` is how many
+ * dots there are to spend: the solid lines share them out by length, so the
+ * drawing is as fine as the device allows.
+ */
+function diamondSites(budget: number): Site[] {
+  const outlines: Stroke[] = [];
+  const squares: Stroke[] = [];
+  const dotted: Stroke[] = [];
+  const stroke = (list: Stroke[], from: Vec3, to: Vec3, size: number, role: Stroke["role"]) => {
+    const length = Math.hypot(to[0] - from[0], to[1] - from[1], to[2] - from[2]);
+    if (length > 0.004) list.push({ from, to, length, size, role });
+  };
+
+  for (const slice of SLICES) {
+    const first = slice.sides[0];
+    const last = first + slice.sides.length;
+    const half = slice.sides.length < 4;
+    const rows = Math.round((slice.to - slice.from) * YEAR_ROWS - 1e-6);
+    for (let row = 0; row <= rows; row++) {
+      const year = row === rows ? slice.to : slice.from + row / YEAR_ROWS;
+      const rim = row === 0 || row === rows;
+      // The squares the slice is made of: its two rims, a heavier one each new year, lighter ones between.
+      const size = rim ? 0.36 : row % YEAR_ROWS === 0 ? 0.3 : 0.17;
+      for (const side of slice.sides) {
+        stroke(rim ? outlines : squares, diamondCorner(year, side), diamondCorner(year, side + 1), size, slice);
+      }
+      // A half slice is closed by the face where the diamond was cut in two.
+      if (half) stroke(rim ? outlines : dotted, diamondCorner(year, first), diamondCorner(year, last), rim ? 0.36 : 0.22, slice);
+    }
+    // The slanted edges, from one rim to the other.
+    for (let q = first; q <= (half ? last : last - 1); q++) {
+      stroke(outlines, diamondCorner(slice.from, q), diamondCorner(slice.to, q), 0.36, slice);
+    }
+  }
+  // The tip still to be built: its edges and the squares of the years to come, dotted.
+  for (let q = 0; q < 4; q++) {
+    stroke(dotted, diamondCorner(TODAY, q), diamondCorner(DIAMOND_YEARS, q), 0.34, TIP);
+    for (let year = Math.ceil(TODAY); year < DIAMOND_YEARS; year++) {
+      stroke(dotted, diamondCorner(year, q), diamondCorner(year, q + 1), 0.28, TIP);
+    }
+  }
+
+  const sites: Site[] = [];
+  const lay = (list: Stroke[], spacing: number) => {
+    for (const { from, to, length, size, role } of list) {
+      const dots = Math.max(2, Math.round(length / spacing));
+      for (let j = 0; j < dots; j++) {
+        const u = (j + 0.5) / dots;
+        sites.push({
+          at: [from[0] + (to[0] - from[0]) * u, from[1] + (to[1] - from[1]) * u, from[2] + (to[2] - from[2]) * u],
+          size,
+          ink: role.ink,
+          lift: role.lift,
+          shift: role.shift,
+          turn: role.turn / TURNS,
+        });
+      }
+    }
+  };
+  lay(dotted, 0.034);
+  const total = (list: Stroke[]) => list.reduce((sum, item) => sum + item.length, 0);
+  const left = (budget - sites.length) * 0.96;
+  // A third of what is left goes to the outlines, the rest to the squares. Never finer than a solid line needs.
+  lay(outlines, Math.max(total(outlines) / (left * 0.34), 0.008));
+  lay(squares, Math.max(total(squares) / (left * 0.66), 0.009));
+  return sites.slice(0, budget);
+}
+
+/**
  * Lab scene: the route climbs from the start (left, low) to the arrival
  * (right, high). Only heights are fixed here; where each stop sits across the
  * screen is decided at run time, so the stops line up with their captions.
@@ -160,7 +302,10 @@ export function buildFormations(count: number): Formations {
 
   const sphere = new Float32Array(count * 3);
   const agents = new Float32Array(count * 3);
-  const lattice = new Float32Array(count * 3);
+  const carve = new Float32Array(count * 3);
+  const carveInfo = new Float32Array(count * 3);
+  const tower = new Float32Array(count * 4);
+  const towerInfo = new Float32Array(count * 3);
   const terrain = new Float32Array(count * 3);
   const point = new Float32Array(count * 3);
   const sizeA = new Float32Array(count * 4);
@@ -184,8 +329,16 @@ export function buildFormations(count: number): Formations {
   const linkCount = Math.floor(count * 0.22);
   const linksEnd = toolsEnd + linkCount;
 
-  const latticeSide = 10;
-  const latticeNodes = latticeSide ** 3;
+  // Principles scene: how the particles are shared out.
+  const edgeCount = Math.floor(count * 0.2);
+  const blockCount = Math.floor(count * 0.11);
+  const blocksEnd = edgeCount + blockCount * CARVE_BUILT.length;
+  const gridEnd = blocksEnd + Math.floor(count * 0.26);
+  const blockSide = Math.floor(Math.sqrt(blockCount / 6));
+
+  // Clients scene: the diamond takes most of the particles, the dust a few, the rest stay hidden.
+  const diamond = diamondSites(Math.floor(count * 0.84));
+  const diamondDustEnd = diamond.length + Math.floor(count * 0.08);
   // Lab scene: how the particles are shared out.
   const pathCount = Math.floor(count * 0.07);
   const arrivalCount = Math.floor(count * 0.035);
@@ -269,18 +422,87 @@ export function buildFormations(count: number): Formations {
     agents[i3 + 1] = seat[1];
     agents[i3 + 2] = seat[2];
 
-    // 2 · Lattice: several particles share each node, so nodes read as solid dots.
-    const node = i % latticeNodes;
-    const lx = node % latticeSide;
-    const ly = Math.floor(node / latticeSide) % latticeSide;
-    const lz = Math.floor(node / (latticeSide * latticeSide));
-    const step = 2 / (latticeSide - 1);
-    lattice[i3] = -1 + lx * step + gauss() * 0.002;
-    lattice[i3 + 1] = -1 + ly * step + gauss() * 0.002;
-    lattice[i3 + 2] = -1 + lz * step + gauss() * 0.002;
-    sizeA[i * 4 + 2] = 0.85;
+    // 2 · Principles: the cube's edges, the four built blocks, the dotted grid
+    // of the cells left empty, and a little loose dust.
+    const spot: Vec3 = [0, 0, 0];
+    if (i < edgeCount) {
+      const axis = i % 3;
+      spot[axis] = (rnd() * 2 - 1) * CARVE_HALF;
+      spot[(axis + 1) % 3] = rnd() < 0.5 ? -CARVE_HALF : CARVE_HALF;
+      spot[(axis + 2) % 3] = rnd() < 0.5 ? -CARVE_HALF : CARVE_HALF;
+      carveInfo[i3] = 0.36;
+      carveInfo[i3 + 1] = 1;
+    } else if (i < blocksEnd) {
+      const j = i - edgeCount;
+      const block = j % CARVE_BUILT.length;
+      const k = Math.floor(j / CARVE_BUILT.length);
+      const face = k % 6;
+      const cell = Math.floor(k / 6);
+      const centre = CARVE_BUILT[block].map((at) => -CARVE_HALF + (at + 0.5) * CARVE_CELL);
+      if (cell < blockSide * blockSide) {
+        // A regular grid of dots on each face, so the block reads as a solid.
+        const axis = face >> 1;
+        const a = ((cell % blockSide) / (blockSide - 1) - 0.5) * 2 * CARVE_BLOCK;
+        const b = (Math.floor(cell / blockSide) / (blockSide - 1) - 0.5) * 2 * CARVE_BLOCK;
+        spot[axis] = centre[axis] + (face & 1 ? CARVE_BLOCK : -CARVE_BLOCK);
+        spot[(axis + 1) % 3] = centre[(axis + 1) % 3] + a;
+        spot[(axis + 2) % 3] = centre[(axis + 2) % 3] + b;
+        carveInfo[i3] = 0.5;
+      } else {
+        spot[0] = centre[0];
+        spot[1] = centre[1];
+        spot[2] = centre[2];
+      }
+      carveInfo[i3 + 2] = (block + 1) / CARVE_BUILT.length;
+    } else if (i < gridEnd) {
+      // A line of the inner grid: never one of the twelve outer edges.
+      const axis = i % 3;
+      let u = 0;
+      let v = 0;
+      while ((u === 0 || u === 3) && (v === 0 || v === 3)) {
+        u = Math.floor(rnd() * 4);
+        v = Math.floor(rnd() * 4);
+      }
+      // Quantised, so the line reads as dotted.
+      spot[axis] = -CARVE_HALF + (Math.round(rnd() * 24) / 24) * 2 * CARVE_HALF;
+      spot[(axis + 1) % 3] = -CARVE_HALF + u * CARVE_CELL;
+      spot[(axis + 2) % 3] = -CARVE_HALF + v * CARVE_CELL;
+      carveInfo[i3] = 0.3;
+      carveInfo[i3 + 1] = 1;
+    } else {
+      spot[0] = (rnd() * 2 - 1) * 1.7;
+      spot[1] = (rnd() * 2 - 1) * 1.4;
+      spot[2] = (rnd() * 2 - 1) * 1.1;
+      const big = rnd();
+      carveInfo[i3] = 0.1 + 0.24 * big * big;
+      carveInfo[i3 + 1] = ink[i];
+    }
+    carve[i3] = spot[0];
+    carve[i3 + 1] = spot[1];
+    carve[i3 + 2] = spot[2];
 
-    // 3 · Lab: a route from start to arrival (four stops, the hops between them,
+    // 3 · Clients: the dots of the diamond, then a little loose dust. The rest have no size here.
+    const i4 = i * 4;
+    if (i < diamond.length) {
+      const site = diamond[i];
+      tower[i4] = site.at[0];
+      tower[i4 + 1] = site.at[1];
+      tower[i4 + 2] = site.at[2];
+      tower[i4 + 3] = site.ink;
+      sizeA[i4 + 2] = site.size;
+      towerInfo[i3] = site.lift;
+      towerInfo[i3 + 1] = site.shift;
+      towerInfo[i3 + 2] = site.turn;
+    } else if (i < diamondDustEnd) {
+      tower[i4] = (rnd() * 2 - 1) * 1.6;
+      tower[i4 + 1] = (rnd() * 2 - 1) * 1.6;
+      tower[i4 + 2] = (rnd() * 2 - 1) * 1.6;
+      tower[i4 + 3] = ink[i];
+      const big = rnd();
+      sizeA[i4 + 2] = 0.1 + 0.24 * big * big;
+    }
+
+    // 4 · Lab: a route from start to arrival (four stops, the hops between them,
     // a stem under each stop) over a low field of waves.
     if (i < pathCount) {
       const along = rnd() * (ROUTE_HEIGHTS.length - 1);
@@ -344,7 +566,7 @@ export function buildFormations(count: number): Formations {
       lab[i * 4 + 2] = rnd() < 0.1 ? 0 : 1;
     }
 
-    // 4 · Point: a small dense core with a spiral of stragglers still arriving.
+    // 5 · Point: a small dense core with a spiral of stragglers still arriving.
     if (i % 100 < 55) {
       const a = rnd() * Math.PI * 2;
       const y = rnd() * 2 - 1;
@@ -365,5 +587,5 @@ export function buildFormations(count: number): Formations {
     }
   }
 
-  return { count, sphere, agents, lattice, terrain, point, sizeA, sizeB, seed, ink, tone, flow, lab };
+  return { count, sphere, agents, carve, carveInfo, tower, towerInfo, terrain, point, sizeA, sizeB, seed, ink, tone, flow, lab };
 }

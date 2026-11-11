@@ -3,7 +3,7 @@
  * Kept outside React on purpose: it changes every frame.
  */
 export const stage = {
-  /** Scene progress: 0 hero, 1 services, 2 clients, 3 lab, 4 contact. Fractions are flights. */
+  /** Scene progress: 0 hero, 1 services, 2 principles, 3 clients, 4 lab, 5 contact. Fractions are flights. */
   t: 0,
   /** Opening, 0 (particles off-screen, left and right) to 1 (assembled). */
   intro: 0,
@@ -20,4 +20,4 @@ export const stage = {
   reduced: false,
 };
 
-export const SCENE_COUNT = 5;
+export const SCENE_COUNT = 6;
