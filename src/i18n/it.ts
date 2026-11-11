@@ -27,7 +27,7 @@ export const it: Dictionary = {
     secondary: "Vedi l'esperienza",
     stats: [
       { value: "9+ anni", label: "di software in produzione" },
-      { value: "Fino a 6", label: "ingegneri guidati" },
+      { value: "Oltre 20", label: "ingegneri guidati" },
       { value: "Italia e USA", label: "clienti seguiti" },
     ],
   },

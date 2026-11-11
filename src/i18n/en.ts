@@ -25,7 +25,7 @@ export const en = {
     secondary: "See my experience",
     stats: [
       { value: "9+ years", label: "in production software" },
-      { value: "Up to 6", label: "engineers led" },
+      { value: "Over 20", label: "engineers led" },
       { value: "Italy & USA", label: "clients served" },
     ],
   },
